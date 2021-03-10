@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import List, Text
 from unittest.mock import Mock
 
 import pytest
@@ -13,6 +12,7 @@ from rasa.shared.nlu.interpreter import RegexInterpreter
 from rasa.core.train import train
 from rasa.core.agent import Agent
 from rasa.core.policies.form_policy import FormPolicy
+from rasa.core.policies.ted_policy import TEDPolicy
 
 from rasa.shared.core.training_data.visualization import visualize_stories
 from tests.core.conftest import DEFAULT_DOMAIN_PATH_WITH_SLOTS, DEFAULT_STORIES_FILE
@@ -122,31 +122,34 @@ async def test_training_script_with_restart_stories(tmp_path: Path):
     assert True
 
 
-def configs_for_random_seed_test() -> List[Text]:
-    # define the configs for the random_seed tests
-    return ["data/test_config/ted_random_seed.yaml"]
+async def test_random_seed(tmp_path: Path, monkeypatch: MonkeyPatch):
+    policies_config = {
+        "policies": [
+            {"name": TEDPolicy.__name__, "random_seed": 42},
+            {"name": RulePolicy.__name__},
+        ]
+    }
 
+    policy_train = Mock()
+    monkeypatch.setattr(TEDPolicy, "train", policy_train)
 
-@pytest.mark.parametrize("config_file", configs_for_random_seed_test())
-async def test_random_seed(tmp_path: Path, config_file: Text):
-    # set random seed in config file to
-    # generate a reproducible training result
+    interpreter = Mock(spec=RasaNLUInterpreter)
 
     agent_1 = await train(
         DEFAULT_DOMAIN_PATH_WITH_SLOTS,
         DEFAULT_STORIES_FILE,
-        str(tmp_path / "1"),
-        interpreter=RegexInterpreter(),
-        policy_config=config_file,
+        str(tmp_path),
+        interpreter=interpreter,
+        policy_config=policies_config,
         additional_arguments={},
     )
 
     agent_2 = await train(
         DEFAULT_DOMAIN_PATH_WITH_SLOTS,
         DEFAULT_STORIES_FILE,
-        str(tmp_path / "2"),
-        interpreter=RegexInterpreter(),
-        policy_config=config_file,
+        str(tmp_path),
+        interpreter=interpreter,
+        policy_config=policies_config,
         additional_arguments={},
     )
 
@@ -161,8 +164,6 @@ async def test_random_seed(tmp_path: Path, config_file: Text):
 async def test_trained_interpreter_passed_to_policies(
     tmp_path: Path, monkeypatch: MonkeyPatch
 ):
-    from rasa.core.policies.ted_policy import TEDPolicy
-
     policies_config = {
         "policies": [{"name": TEDPolicy.__name__}, {"name": RulePolicy.__name__}]
     }
