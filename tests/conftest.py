@@ -211,7 +211,7 @@ async def default_agent(_trained_default_agent: Agent) -> Agent:
 
 
 @pytest.fixture(scope="session")
-async def trained_moodbot_path(trained_async: Callable) -> Text:
+async def trained_moodbot_path(trained_async: Callable) -> Text:  # TODO: JUZL:
     return await trained_async(
         domain="examples/moodbot/domain.yml",
         config="examples/moodbot/config.yml",
@@ -220,7 +220,7 @@ async def trained_moodbot_path(trained_async: Callable) -> Text:
 
 
 @pytest.fixture(scope="session")
-async def trained_nlu_moodbot_path(trained_nlu_async: Callable) -> Text:
+async def trained_nlu_moodbot_path(trained_nlu_async: Callable) -> Text:  # TODO: JUZL:
     return await trained_nlu_async(
         domain="examples/moodbot/domain.yml",
         config="examples/moodbot/config.yml",
@@ -229,7 +229,7 @@ async def trained_nlu_moodbot_path(trained_nlu_async: Callable) -> Text:
 
 
 @pytest.fixture(scope="session")
-async def unpacked_trained_moodbot_path(
+async def unpacked_trained_moodbot_path(  # TODO: JUZL:
     trained_moodbot_path: Text,
 ) -> TempDirectoryPath:
     return get_model(trained_moodbot_path)
@@ -378,7 +378,7 @@ async def trained_e2e_model(
 
 
 @pytest.fixture(scope="session")
-def moodbot_domain() -> Domain:
+def moodbot_domain() -> Domain:  # TODO: JUZL:
     domain_path = os.path.join("examples", "moodbot", "domain.yml")
     return Domain.load(domain_path)
 
