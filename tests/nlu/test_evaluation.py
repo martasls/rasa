@@ -373,7 +373,10 @@ async def test_run_evaluation(unpacked_trained_moodbot_path: Text):
 
 
 async def test_eval_data(
-    component_builder: ComponentBuilder, tmp_path: Path, project: Text, trained_simple_rasa_model: Text
+    component_builder: ComponentBuilder,
+    tmp_path: Path,
+    project: Text,
+    trained_simple_rasa_model: Text,
 ):
     _config = RasaNLUModelConfig(
         {

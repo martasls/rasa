@@ -1,7 +1,6 @@
 from pathlib import Path
 from unittest.mock import Mock
 
-import pytest
 from _pytest.monkeypatch import MonkeyPatch
 
 from rasa.core.policies.memoization import MemoizationPolicy, OLD_DEFAULT_MAX_HISTORY
@@ -15,7 +14,11 @@ from rasa.core.policies.form_policy import FormPolicy
 from rasa.core.policies.ted_policy import TEDPolicy
 
 from rasa.shared.core.training_data.visualization import visualize_stories
-from tests.core.conftest import DEFAULT_DOMAIN_PATH_WITH_SLOTS, DEFAULT_STORIES_FILE
+from tests.core.conftest import (
+    DEFAULT_DOMAIN_PATH_WITH_SLOTS,
+    DEFAULT_STORIES_FILE,
+    SIMPLE_STORIES_FILE,
+)
 
 
 async def test_story_visualization(default_domain: Domain, tmp_path: Path):
@@ -68,13 +71,19 @@ async def test_training_script(tmp_path: Path):
     assert True
 
 
-async def test_training_script_without_max_history_set(tmp_path: Path):
+async def test_training_script_without_max_history_set(
+    tmp_path: Path, monkeypatch: MonkeyPatch
+):
     tmpdir = str(tmp_path)
+
+    policy_train = Mock()
+    monkeypatch.setattr(TEDPolicy, "train", policy_train)
+
     await train(
         DEFAULT_DOMAIN_PATH_WITH_SLOTS,
         DEFAULT_STORIES_FILE,
         tmpdir,
-        interpreter=RegexInterpreter(),
+        interpreter=Mock(spec=RasaNLUInterpreter),
         policy_config="data/test_config/no_max_hist_config.yml",
         additional_arguments={},
     )
@@ -90,14 +99,19 @@ async def test_training_script_without_max_history_set(tmp_path: Path):
                 assert policy.featurizer.max_history is None
 
 
-async def test_training_script_with_max_history_set(tmp_path: Path):
+async def test_training_script_with_max_history_set(
+    tmp_path: Path, monkeypatch: MonkeyPatch
+):
     tmpdir = str(tmp_path)
+
+    policy_train = Mock()
+    monkeypatch.setattr(TEDPolicy, "train", policy_train)
 
     await train(
         DEFAULT_DOMAIN_PATH_WITH_SLOTS,
         DEFAULT_STORIES_FILE,
         tmpdir,
-        interpreter=RegexInterpreter(),
+        interpreter=Mock(spec=RasaNLUInterpreter),
         policy_config="data/test_config/max_hist_config.yml",
         additional_arguments={},
     )
