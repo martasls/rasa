@@ -17,7 +17,6 @@ from rasa.shared.core.training_data.visualization import visualize_stories
 from tests.core.conftest import (
     DEFAULT_DOMAIN_PATH_WITH_SLOTS,
     DEFAULT_STORIES_FILE,
-    SIMPLE_STORIES_FILE,
 )
 
 
@@ -57,18 +56,6 @@ async def test_story_visualization_with_merging(default_domain: Domain):
     assert 15 < len(generated_graph.nodes()) < 33
 
     assert 20 < len(generated_graph.edges()) < 33
-
-
-async def test_training_script(tmp_path: Path):
-    await train(
-        DEFAULT_DOMAIN_PATH_WITH_SLOTS,
-        DEFAULT_STORIES_FILE,
-        str(tmp_path),
-        policy_config="data/test_config/max_hist_config.yml",
-        interpreter=RegexInterpreter(),
-        additional_arguments={},
-    )
-    assert True
 
 
 async def test_training_script_without_max_history_set(
@@ -131,7 +118,7 @@ async def test_training_script_with_restart_stories(tmp_path: Path):
         str(tmp_path),
         interpreter=RegexInterpreter(),
         policy_config="data/test_config/max_hist_config.yml",
-        additional_arguments={},
+        additional_arguments={}
     )
     assert True
 
