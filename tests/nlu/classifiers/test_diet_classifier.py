@@ -29,6 +29,7 @@ from rasa.utils.tensorflow.constants import (
     TENSORBOARD_LOG_DIR,
     EVAL_NUM_EPOCHS,
     EVAL_NUM_EXAMPLES,
+    CONSTRAIN_SIMILARITIES,
     CHECKPOINT_MODEL,
     BILOU_FLAG,
     ENTITY_RECOGNITION,
@@ -549,12 +550,19 @@ async def test_train_model_checkpointing(
         {
             "pipeline": [
                 {"name": "WhitespaceTokenizer"},
-                {"name": "CountVectorsFeaturizer"},
+                {
+                    "name": "CountVectorsFeaturizer",
+                    "analyzer": "char_wb",
+                    "min_ngram": 3,
+                    "max_ngram": 17,
+                    "max_features": 10,
+                    "min_df": 5,
+                },
                 {
                     "name": "DIETClassifier",
                     EPOCHS: 5,
-                    EVAL_NUM_EXAMPLES: 10,
-                    EVAL_NUM_EPOCHS: 1,
+                    CONSTRAIN_SIMILARITIES: True,
+                    MODEL_CONFIDENCE: "linear_norm",
                     CHECKPOINT_MODEL: True,
                 },
             ],
@@ -565,7 +573,7 @@ async def test_train_model_checkpointing(
     await train(
         _config,
         path=str(tmpdir),
-        data="data/examples/rasa/demo-rasa.yml",
+        data="examples/moodbot/data/nlu.yml",
         component_builder=component_builder,
         fixed_model_name=model_name,
     )
