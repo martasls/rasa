@@ -118,7 +118,7 @@ async def test_training_script_with_restart_stories(tmp_path: Path):
         str(tmp_path),
         interpreter=RegexInterpreter(),
         policy_config="data/test_config/max_hist_config.yml",
-        additional_arguments={}
+        additional_arguments={},
     )
     assert True
 
